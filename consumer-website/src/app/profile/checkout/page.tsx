@@ -93,24 +93,101 @@ const CheckoutPage = () => {
     }
   }, [user]);
 
+  // Validation functions
+  const validateShippingInfo = () => {
+    if (!shippingInfo.fullName.trim()) {
+      setError('Full name is required');
+      return false;
+    }
+    if (!shippingInfo.email.trim()) {
+      setError('Email is required');
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(shippingInfo.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    if (!shippingInfo.phone.trim()) {
+      setError('Phone number is required');
+      return false;
+    }
+    if (!shippingInfo.address.trim()) {
+      setError('Street address is required');
+      return false;
+    }
+    if (!shippingInfo.city.trim()) {
+      setError('City is required');
+      return false;
+    }
+    if (!shippingInfo.state.trim()) {
+      setError('State/Province is required');
+      return false;
+    }
+    if (!shippingInfo.zipCode.trim()) {
+      setError('ZIP/Postal code is required');
+      return false;
+    }
+    if (!shippingInfo.country.trim()) {
+      setError('Country is required');
+      return false;
+    }
+    return true;
+  };
+
+  const validatePaymentInfo = () => {
+    if (!paymentInfo.cardName.trim()) {
+      setError('Name on card is required');
+      return false;
+    }
+    if (!paymentInfo.cardNumber.trim()) {
+      setError('Card number is required');
+      return false;
+    }
+    if (!/^\d{16}$/.test(paymentInfo.cardNumber.replace(/\s/g, ''))) {
+      setError('Please enter a valid 16-digit card number');
+      return false;
+    }
+    if (!paymentInfo.expiryDate.trim()) {
+      setError('Expiration date is required');
+      return false;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(paymentInfo.expiryDate)) {
+      setError('Please enter expiration date in MM/YY format');
+      return false;
+    }
+    if (!paymentInfo.cvv.trim()) {
+      setError('CVV is required');
+      return false;
+    }
+    if (!/^\d{3,4}$/.test(paymentInfo.cvv)) {
+      setError('Please enter a valid CVV (3 or 4 digits)');
+      return false;
+    }
+    return true;
+  };
+
+  const handleNextStep = () => {
+    setError(null);
+    
+    if (activeStep === 1) {
+      if (validateShippingInfo()) {
+        setActiveStep(2);
+      }
+    } else if (activeStep === 2) {
+      if (validatePaymentInfo()) {
+        setActiveStep(3);
+      }
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (!user || !user.token) {
       setError('You must be logged in to place an order');
       return;
     }
 
-    // Validate shipping info
-    if (!shippingInfo.fullName || !shippingInfo.address || !shippingInfo.city || 
-        !shippingInfo.state || !shippingInfo.zipCode || !shippingInfo.country || 
-        !shippingInfo.phone) {
-      setError('Please fill in all shipping information');
-      return;
-    }
-
-    // Validate payment info
-    if (!paymentInfo.cardNumber || !paymentInfo.expiryDate || !paymentInfo.cvv || 
-        !paymentInfo.cardName) {
-      setError('Please fill in all payment information');
+    // Final validation before placing order
+    if (!validateShippingInfo() || !validatePaymentInfo()) {
       return;
     }
 
@@ -288,7 +365,7 @@ const CheckoutPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Full Name
+                          Full Name *
                         </label>
                         <div className="relative">
                           <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -304,7 +381,7 @@ const CheckoutPage = () => {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email Address
+                          Email Address *
                         </label>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -320,7 +397,7 @@ const CheckoutPage = () => {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Phone Number
+                          Phone Number *
                         </label>
                         <div className="relative">
                           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -336,7 +413,7 @@ const CheckoutPage = () => {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Country
+                          Country *
                         </label>
                         <select
                           value={shippingInfo.country}
@@ -352,7 +429,7 @@ const CheckoutPage = () => {
                       
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Street Address
+                          Street Address *
                         </label>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -368,7 +445,7 @@ const CheckoutPage = () => {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          City
+                          City *
                         </label>
                         <input
                           type="text"
@@ -381,7 +458,7 @@ const CheckoutPage = () => {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          State/Province
+                          State/Province *
                         </label>
                         <input
                           type="text"
@@ -394,7 +471,7 @@ const CheckoutPage = () => {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          ZIP/Postal Code
+                          ZIP/Postal Code *
                         </label>
                         <input
                           type="text"
@@ -408,7 +485,7 @@ const CheckoutPage = () => {
                     
                     <div className="flex justify-end pt-6">
                       <button
-                        onClick={() => setActiveStep(2)}
+                        onClick={handleNextStep}
                         className="bg-amber-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-700 transition-colors"
                       >
                         Continue to Payment
@@ -452,7 +529,7 @@ const CheckoutPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Name on Card
+                          Name on Card *
                         </label>
                         <input
                           type="text"
@@ -465,12 +542,12 @@ const CheckoutPage = () => {
                       
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Card Number
+                          Card Number *
                         </label>
                         <input
                           type="text"
                           value={paymentInfo.cardNumber}
-                          onChange={(e) => setPaymentInfo({...paymentInfo, cardNumber: e.target.value})}
+                          onChange={(e) => setPaymentInfo({...paymentInfo, cardNumber: e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim()})}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                           placeholder="1234 5678 9012 3456"
                         />
@@ -478,12 +555,12 @@ const CheckoutPage = () => {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Expiration Date
+                          Expiration Date *
                         </label>
                         <input
                           type="text"
                           value={paymentInfo.expiryDate}
-                          onChange={(e) => setPaymentInfo({...paymentInfo, expiryDate: e.target.value})}
+                          onChange={(e) => setPaymentInfo({...paymentInfo, expiryDate: e.target.value.replace(/\D/g, '').replace(/^(\d{2})(\d{0,2})/, '$1/$2').substring(0, 5)})}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                           placeholder="MM/YY"
                         />
@@ -491,12 +568,12 @@ const CheckoutPage = () => {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          CVV
+                          CVV *
                         </label>
                         <input
                           type="text"
                           value={paymentInfo.cvv}
-                          onChange={(e) => setPaymentInfo({...paymentInfo, cvv: e.target.value})}
+                          onChange={(e) => setPaymentInfo({...paymentInfo, cvv: e.target.value.replace(/\D/g, '').substring(0, 4)})}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                           placeholder="123"
                         />
@@ -511,7 +588,7 @@ const CheckoutPage = () => {
                         ← Back to Shipping
                       </button>
                       <button
-                        onClick={() => setActiveStep(3)}
+                        onClick={handleNextStep}
                         className="bg-amber-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-700 transition-colors"
                       >
                         Review Order
