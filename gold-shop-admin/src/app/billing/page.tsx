@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Plus, Printer, CreditCard, Wallet, Calendar, User } from 'lucide-react';
+import { Search, Plus, Printer, CreditCard, Wallet, Calendar, User, CheckCircle } from 'lucide-react';
 
 interface BillingItem {
   id: number;
@@ -40,6 +40,9 @@ const BillingPage = () => {
     }
   ]);
   const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderNumber, setOrderNumber] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleAddItem = () => {
     const newItem: BillingItem = {
@@ -56,13 +59,134 @@ const BillingPage = () => {
     setItems([...items, newItem]);
   };
 
+  const handleRemoveItem = (id: number) => {
+    setItems(items.filter(item => item.id !== id));
+  };
+
   const calculateSubtotal = () => {
-    return items.reduce((sum, item) => sum + item.totalPrice, 0);
+    return items.reduce((sum, item) => sum + (item.totalPrice * item.quantity), 0);
   };
 
   const gstRate = 3; // 3% GST
   const gstAmount = (calculateSubtotal() * gstRate) / 100;
   const totalAmount = calculateSubtotal() + gstAmount;
+
+  const handlePlaceOrder = () => {
+    if (!customer) {
+      alert('Please select or add a customer before placing the order.');
+      return;
+    }
+
+    if (items.length === 0) {
+      alert('Please add at least one item to the order.');
+      return;
+    }
+
+    // Validate that all items have valid data
+    for (const item of items) {
+      if (item.ratePerGram <= 0 || item.quantity <= 0) {
+        alert('Please ensure all items have valid rates and quantities.');
+        return;
+      }
+    }
+
+    setLoading(true);
+    
+    // Simulate API call to place order
+    setTimeout(() => {
+      // Generate a random order number
+      const newOrderNumber = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+      setOrderNumber(newOrderNumber);
+      setOrderPlaced(true);
+      setLoading(false);
+      
+      // In a real application, you would send the order data to your backend here
+      console.log('Order placed:', {
+        customer,
+        items,
+        paymentMethod,
+        totalAmount,
+        orderNumber: newOrderNumber
+      });
+    }, 1500);
+  };
+
+  const handlePrintInvoice = () => {
+    // In a real application, this would generate and print an invoice
+    alert('Invoice would be printed in a real application');
+  };
+
+  const resetOrder = () => {
+    setOrderPlaced(false);
+    setOrderNumber('');
+    setCustomer(null);
+    setItems([
+      {
+        id: 1,
+        name: 'Classic Gold Chain Necklace',
+        sku: 'GC-001',
+        weight: '22.5g',
+        purity: '22K',
+        ratePerGram: 5200,
+        makingCharges: 800,
+        quantity: 1,
+        totalPrice: 125300
+      }
+    ]);
+    setPaymentMethod('cash');
+  };
+
+  if (orderPlaced) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Order Confirmation</h1>
+            <p className="mt-1 text-gray-600">Your order has been successfully placed</p>
+          </div>
+        </div>
+
+        <div className="bg-white shadow rounded-lg p-8 text-center">
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+          </div>
+          
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
+          <p className="text-gray-600 mb-6">Thank you for your purchase. Your order has been confirmed.</p>
+          
+          <div className="bg-gray-50 rounded-lg p-6 max-w-md mx-auto mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-gray-600">Order Number:</span>
+              <span className="font-medium text-amber-600">{orderNumber}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Total Amount:</span>
+              <span className="font-medium text-lg">₹{totalAmount.toLocaleString('en-IN')}</span>
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={handlePrintInvoice}
+              className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+            >
+              <Printer className="h-5 w-5 mr-2" />
+              Print Invoice
+            </button>
+            <button
+              onClick={resetOrder}
+              className="inline-flex items-center justify-center px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors duration-200"
+            >
+              New Order
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -73,7 +197,10 @@ const BillingPage = () => {
           <p className="mt-1 text-gray-600">Create invoices and process payments</p>
         </div>
         <div className="flex space-x-3">
-          <button className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+          <button 
+            className="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+            onClick={handlePrintInvoice}
+          >
             <Printer className="h-5 w-5 mr-2" />
             Print Invoice
           </button>
@@ -229,7 +356,8 @@ const BillingPage = () => {
                           value={item.ratePerGram}
                           onChange={(e) => {
                             const newRate = parseFloat(e.target.value) || 0;
-                            const newTotal = (newRate * parseFloat(item.weight) || 0) + item.makingCharges;
+                            const weightValue = parseFloat(item.weight) || 0;
+                            const newTotal = (newRate * weightValue) + item.makingCharges;
                             setItems(items.map(i => 
                               i.id === item.id 
                                 ? {...i, ratePerGram: newRate, totalPrice: newTotal} 
@@ -245,7 +373,9 @@ const BillingPage = () => {
                           value={item.makingCharges}
                           onChange={(e) => {
                             const newCharges = parseFloat(e.target.value) || 0;
-                            const newTotal = (item.ratePerGram * parseFloat(item.weight) || 0) + newCharges;
+                            const weightValue = parseFloat(item.weight) || 0;
+                            const rateValue = item.ratePerGram || 0;
+                            const newTotal = (rateValue * weightValue) + newCharges;
                             setItems(items.map(i => 
                               i.id === item.id 
                                 ? {...i, makingCharges: newCharges, totalPrice: newTotal} 
@@ -272,7 +402,10 @@ const BillingPage = () => {
                         ₹{(item.totalPrice * item.quantity).toLocaleString('en-IN')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button className="text-red-600 hover:text-red-900">
+                        <button 
+                          className="text-red-600 hover:text-red-900"
+                          onClick={() => handleRemoveItem(item.id)}
+                        >
                           Remove
                         </button>
                       </td>
@@ -338,8 +471,14 @@ const BillingPage = () => {
                 </div>
               </div>
               
-              <button className="w-full mt-6 bg-amber-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-amber-700 transition-colors duration-200">
-                Complete Payment
+              <button 
+                className={`w-full mt-6 bg-amber-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-amber-700 transition-colors duration-200 ${
+                  loading ? 'opacity-75 cursor-not-allowed' : ''
+                }`}
+                onClick={handlePlaceOrder}
+                disabled={loading}
+              >
+                {loading ? 'Placing Order...' : 'Place Order'}
               </button>
             </div>
           </div>

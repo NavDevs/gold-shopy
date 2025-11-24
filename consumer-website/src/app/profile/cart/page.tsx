@@ -18,20 +18,25 @@ interface CartItem {
   quantity: number;
 }
 
+// Helper function to validate cart items
+const isValidCartItem = (item: any): item is CartItem => {
+  return (
+    item &&
+    typeof item.id === 'number' &&
+    typeof item.name === 'string' &&
+    item.name.trim() !== '' &&
+    typeof item.price === 'number' &&
+    item.price > 0 &&
+    typeof item.quantity === 'number' &&
+    item.quantity > 0
+  );
+};
+
 const CartPage = () => {
   const { cartItems, refreshCart, forceRefresh } = useCart();
   
-  // Filter out invalid items
-  const validCartItems = cartItems.filter(item => 
-    item && 
-    item.id && 
-    item.quantity > 0 && 
-    typeof item.price === 'number' && 
-    item.price > 0 &&
-    item.name && 
-    item.name !== 'undefined' &&
-    item.name.trim() !== ''
-  );
+  // Filter out invalid items using the validation function
+  const validCartItems = cartItems.filter(isValidCartItem);
   
   const handleUpdateQuantity = async (id: number, newQuantity: number) => {
     if (newQuantity <= 0) {
@@ -104,7 +109,7 @@ const CartPage = () => {
                         key={item.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center gap-6 pb-6 border-b border-gray-200 last:border-0 last:pb-0"
+                        className="flex items-center border-b border-gray-200 pb-6 last:border-0 last:pb-0"
                       >
                         <div className="w-24 h-24 flex-shrink-0">
                           <img
@@ -113,123 +118,90 @@ const CartPage = () => {
                             className="w-full h-full object-cover rounded-lg"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
-                              target.src = 'https://via.placeholder.com/150?text=Product+Image';
+                              target.src = 'https://via.placeholder.com/400x400/E5E7EB/1F2937?text=Product+Image';
                             }}
                           />
                         </div>
                         
-                        <div className="flex-grow">
-                          <div className="flex justify-between">
-                            <div>
-                              <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                              <p className="text-sm text-gray-600">{item.material} • {item.category}</p>
-                            </div>
+                        <div className="ml-4 flex-grow">
+                          <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                          <p className="text-sm text-gray-600 mt-1">{item.material} • {item.category}</p>
+                          <p className="text-lg font-bold text-amber-600 mt-2">₹{item.price.toLocaleString()}</p>
+                        </div>
+                        
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center border border-gray-300 rounded-lg">
                             <button
-                              onClick={() => handleRemoveFromCart(item.id)}
-                              className="text-gray-400 hover:text-red-500"
+                              onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                              className="p-2 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded-l-lg"
+                              aria-label="Decrease quantity"
                             >
-                              <X size={20} />
+                              <Minus size={16} />
+                            </button>
+                            <span className="px-3 py-2 text-gray-900">{item.quantity}</span>
+                            <button
+                              onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                              className="p-2 text-gray-600 hover:text-amber-600 hover:bg-amber-50 rounded-r-lg"
+                              aria-label="Increase quantity"
+                            >
+                              <Plus size={16} />
                             </button>
                           </div>
                           
-                          <div className="flex items-center justify-between mt-4">
-                            <div className="flex items-center border border-gray-300 rounded-lg">
-                              <button
-                                onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                                className="w-8 h-8 flex items-center justify-center border-r border-gray-300"
-                              >
-                                <Minus size={16} />
-                              </button>
-                              <span className="w-12 h-8 flex items-center justify-center border-t border-b border-gray-300">
-                                {item.quantity}
-                              </span>
-                              <button
-                                onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                                className="w-8 h-8 flex items-center justify-center border-l border-gray-300"
-                              >
-                                <Plus size={16} />
-                              </button>
-                            </div>
-                          
-                            <div className="text-lg font-bold text-amber-600">
-                              ₹{(item.price * item.quantity).toLocaleString()}
-                            </div>
-                          </div>
+                          <button
+                            onClick={() => handleRemoveFromCart(item.id)}
+                            className="p-2 text-gray-400 hover:text-red-500"
+                            aria-label="Remove item"
+                          >
+                            <X size={20} />
+                          </button>
                         </div>
                       </motion.div>
                     ))}
                   </div>
                 </div>
-              
-                <div className="mt-6">
-                  <Link
-                    href="/collections"
-                    className="inline-flex items-center text-gray-600 hover:text-amber-600"
-                  >
-                    <ArrowLeft size={20} className="mr-1" />
-                    Continue Shopping
-                  </Link>
-                </div>
               </div>
-            
-              <div>
-                <div className="bg-white rounded-xl shadow-lg p-6 sticky top-4">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
-                  <div className="space-y-3">
+              
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-xl shadow-lg p-6 sticky top-8">
+                  <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
+                  
+                  <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subtotal</span>
                       <span className="font-medium">₹{subtotal.toLocaleString()}</span>
                     </div>
+                    
                     <div className="flex justify-between">
                       <span className="text-gray-600">Shipping</span>
-                      <span className="font-medium">{shipping === 0 ? 'FREE' : `₹${shipping.toLocaleString()}`}</span>
+                      <span className="font-medium">{shipping === 0 ? 'Free' : `₹${shipping.toLocaleString()}`}</span>
                     </div>
+                    
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Tax (3%)</span>
+                      <span className="text-gray-600">Tax</span>
                       <span className="font-medium">₹{tax.toLocaleString()}</span>
                     </div>
-                    <div className="border-t border-gray-200 pt-3 flex justify-between text-lg font-bold">
-                      <span>Total</span>
-                      <span className="text-amber-600">₹{total.toLocaleString()}</span>
+                    
+                    <div className="border-t border-gray-200 pt-4">
+                      <div className="flex justify-between text-lg font-bold">
+                        <span>Total</span>
+                        <span className="text-amber-600">₹{total.toLocaleString()}</span>
+                      </div>
                     </div>
-                  </div>
-                
-                  <Link 
-                    href="/profile/checkout"
-                    className="w-full mt-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors flex items-center justify-center"
-                  >
-                    <Package size={20} className="mr-2" />
-                    Place Order
-                  </Link>
-                
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <h3 className="font-medium text-gray-900 mb-3">Why shop with us?</h3>
-                    <ul className="space-y-2 text-sm text-gray-600">
-                      <li className="flex items-center">
-                        <div className="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center mr-2">
-                          <div className="w-2 h-2 bg-amber-600 rounded-full"></div>
-                        </div>
-                        BIS Hallmarked Jewelry
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center mr-2">
-                          <div className="w-2 h-2 bg-amber-600 rounded-full"></div>
-                        </div>
-                        Lifetime Maintenance
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center mr-2">
-                          <div className="w-2 h-2 bg-amber-600 rounded-full"></div>
-                        </div>
-                        Free Shipping Over ₹1Lakh
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-5 h-5 bg-amber-100 rounded-full flex items-center justify-center mr-2">
-                          <div className="w-2 h-2 bg-amber-600 rounded-full"></div>
-                        </div>
-                        30-Day Return Policy
-                      </li>
-                    </ul>
+                    
+                    <Link
+                      href="/profile/checkout"
+                      className="block w-full bg-amber-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-amber-700 transition-colors mt-6"
+                    >
+                      Proceed to Checkout
+                    </Link>
+                    
+                    <Link
+                      href="/collections"
+                      className="block w-full text-center py-3 text-gray-600 hover:text-amber-600 transition-colors"
+                    >
+                      Continue Shopping
+                    </Link>
                   </div>
                 </div>
               </div>

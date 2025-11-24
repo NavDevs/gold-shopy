@@ -1,5 +1,15 @@
 // Mock database for development purposes when MongoDB is not available
 
+// Helper function to validate product ID
+const isValidProductId = (id) => {
+  return typeof id === 'number' && id > 0;
+};
+
+// Helper function to validate quantity
+const isValidQuantity = (quantity) => {
+  return typeof quantity === 'number' && quantity > 0 && Number.isInteger(quantity);
+};
+
 class MockDB {
   constructor() {
     this.data = {
@@ -186,20 +196,41 @@ class MockDB {
       };
       this.data.carts.push(cart);
     }
+    
+    // Filter out invalid items
+    cart.items = cart.items.filter(item => 
+      item && 
+      isValidProductId(item.productId) && 
+      isValidQuantity(item.quantity)
+    );
+    
     return cart;
   }
 
   addToCart(userId, productId, quantity = 1) {
+    // Validate inputs
+    if (!isValidProductId(productId)) {
+      throw new Error('Invalid product ID');
+    }
+    
+    if (!isValidQuantity(quantity)) {
+      throw new Error('Invalid quantity');
+    }
+    
     const cart = this.getCart(userId);
     const existingItemIndex = cart.items.findIndex(item => item.productId === productId);
     
     if (existingItemIndex !== -1) {
       cart.items[existingItemIndex].quantity += quantity;
     } else {
-      cart.items.push({
-        productId,
-        quantity
-      });
+      // Check if product exists before adding
+      const product = this.getProductById(productId);
+      if (product) {
+        cart.items.push({
+          productId,
+          quantity
+        });
+      }
     }
     
     cart.updatedAt = new Date();
@@ -207,6 +238,11 @@ class MockDB {
   }
 
   removeFromCart(userId, productId) {
+    // Validate inputs
+    if (!isValidProductId(productId)) {
+      throw new Error('Invalid product ID');
+    }
+    
     const cart = this.getCart(userId);
     cart.items = cart.items.filter(item => item.productId !== productId);
     cart.updatedAt = new Date();
@@ -214,6 +250,15 @@ class MockDB {
   }
 
   updateCartItem(userId, productId, quantity) {
+    // Validate inputs
+    if (!isValidProductId(productId)) {
+      throw new Error('Invalid product ID');
+    }
+    
+    if (!isValidQuantity(quantity) && quantity !== 0) {
+      throw new Error('Invalid quantity');
+    }
+    
     const cart = this.getCart(userId);
     const itemIndex = cart.items.findIndex(item => item.productId === productId);
     
@@ -255,10 +300,19 @@ class MockDB {
   }
 
   addToWishlist(userId, productId) {
+    // Validate inputs
+    if (!isValidProductId(productId)) {
+      throw new Error('Invalid product ID');
+    }
+    
     const wishlist = this.getWishlist(userId);
     // Check if item already exists in wishlist
     if (!wishlist.productIds.includes(productId)) {
-      wishlist.productIds.push(productId);
+      // Check if product exists before adding
+      const product = this.getProductById(productId);
+      if (product) {
+        wishlist.productIds.push(productId);
+      }
     }
     
     wishlist.updatedAt = new Date();
@@ -266,6 +320,11 @@ class MockDB {
   }
 
   removeFromWishlist(userId, productId) {
+    // Validate inputs
+    if (!isValidProductId(productId)) {
+      throw new Error('Invalid product ID');
+    }
+    
     const wishlist = this.getWishlist(userId);
     wishlist.productIds = wishlist.productIds.filter(id => id !== productId);
     wishlist.updatedAt = new Date();
@@ -274,6 +333,11 @@ class MockDB {
 
   // Move item from wishlist to cart
   moveFromWishlistToCart(userId, productId) {
+    // Validate inputs
+    if (!isValidProductId(productId)) {
+      throw new Error('Invalid product ID');
+    }
+    
     // Remove from wishlist
     const wishlist = this.removeFromWishlist(userId, productId);
     

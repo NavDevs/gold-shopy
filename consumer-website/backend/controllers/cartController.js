@@ -1,6 +1,16 @@
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 
+// Helper function to validate product ID
+const isValidObjectId = (id) => {
+  return typeof id === 'string' && id.length > 0;
+};
+
+// Helper function to validate quantity
+const isValidQuantity = (quantity) => {
+  return typeof quantity === 'number' && quantity > 0 && Number.isInteger(quantity);
+};
+
 // Get user cart
 const getCart = async (req, res) => {
   try {
@@ -8,13 +18,19 @@ const getCart = async (req, res) => {
       // Use mock database
       const cart = req.mockDb.getCart(req.user.id);
       
-      // Populate product details
+      // Populate product details and filter out invalid items
+      const validItems = cart.items.filter(item => 
+        item && 
+        isValidObjectId(item.productId) && 
+        isValidQuantity(item.quantity)
+      );
+      
       const populatedCart = {
         ...cart,
-        items: cart.items.map(item => ({
+        items: validItems.map(item => ({
           productId: req.mockDb.getProductById(item.productId),
           quantity: item.quantity
-        }))
+        })).filter(item => item.productId) // Filter out items where product doesn't exist
       };
       
       return res.json(populatedCart);
@@ -25,6 +41,19 @@ const getCart = async (req, res) => {
     if (!cart) {
       // Create a new empty cart if it doesn't exist
       cart = await Cart.create({ userId: req.user.id, items: [] });
+    }
+    
+    // Filter out invalid items from the cart
+    const validItems = cart.items.filter(item => 
+      item && 
+      item.productId && 
+      isValidQuantity(item.quantity)
+    );
+    
+    // If we filtered out any items, update the cart
+    if (validItems.length !== cart.items.length) {
+      cart.items = validItems;
+      await cart.save();
     }
     
     res.json(cart);
@@ -38,24 +67,39 @@ const addToCart = async (req, res) => {
   try {
     const { productId, quantity = 1 } = req.body;
     
+    // Validate inputs
+    if (!isValidObjectId(productId)) {
+      return res.status(400).json({ message: 'Invalid product ID' });
+    }
+    
+    if (!isValidQuantity(quantity)) {
+      return res.status(400).json({ message: 'Invalid quantity. Quantity must be a positive integer.' });
+    }
+    
     if (req.useMockDb && req.mockDb) {
       // Use mock database
       // Check if product exists
-      const product = req.mockDb.getProductById(productId);
+      const product = req.mockDb.getProductById(parseInt(productId));
       if (!product) {
         return res.status(404).json({ message: 'Product not found' });
       }
       
       // Add to cart
-      const cart = req.mockDb.addToCart(req.user.id, productId, quantity);
+      const cart = req.mockDb.addToCart(req.user.id, parseInt(productId), quantity);
       
-      // Populate product details
+      // Populate product details and filter out invalid items
+      const validItems = cart.items.filter(item => 
+        item && 
+        isValidObjectId(item.productId) && 
+        isValidQuantity(item.quantity)
+      );
+      
       const populatedCart = {
         ...cart,
-        items: cart.items.map(item => ({
+        items: validItems.map(item => ({
           productId: req.mockDb.getProductById(item.productId),
           quantity: item.quantity
-        }))
+        })).filter(item => item.productId) // Filter out items where product doesn't exist
       };
       
       return res.json(populatedCart);
@@ -90,7 +134,19 @@ const addToCart = async (req, res) => {
     // Populate product details
     await cart.populate('items.productId');
     
-    res.json(cart);
+    // Filter out invalid items from the response
+    const validItems = cart.items.filter(item => 
+      item && 
+      item.productId && 
+      isValidQuantity(item.quantity)
+    );
+    
+    const responseCart = {
+      ...cart.toObject(),
+      items: validItems
+    };
+    
+    res.json(responseCart);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -101,17 +157,32 @@ const updateCartItem = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
     
+    // Validate inputs
+    if (!isValidObjectId(productId)) {
+      return res.status(400).json({ message: 'Invalid product ID' });
+    }
+    
+    if (!isValidQuantity(quantity) && quantity !== 0) {
+      return res.status(400).json({ message: 'Invalid quantity. Quantity must be a non-negative integer.' });
+    }
+    
     if (req.useMockDb && req.mockDb) {
       // Use mock database
-      const cart = req.mockDb.updateCartItem(req.user.id, productId, quantity);
+      const cart = req.mockDb.updateCartItem(req.user.id, parseInt(productId), quantity);
       
-      // Populate product details
+      // Populate product details and filter out invalid items
+      const validItems = cart.items.filter(item => 
+        item && 
+        isValidObjectId(item.productId) && 
+        (isValidQuantity(item.quantity) || item.quantity === 0)
+      );
+      
       const populatedCart = {
         ...cart,
-        items: cart.items.map(item => ({
+        items: validItems.map(item => ({
           productId: req.mockDb.getProductById(item.productId),
           quantity: item.quantity
-        }))
+        })).filter(item => item.productId) // Filter out items where product doesn't exist
       };
       
       return res.json(populatedCart);
@@ -142,7 +213,19 @@ const updateCartItem = async (req, res) => {
     // Populate product details
     await cart.populate('items.productId');
     
-    res.json(cart);
+    // Filter out invalid items from the response
+    const validItems = cart.items.filter(item => 
+      item && 
+      item.productId && 
+      (isValidQuantity(item.quantity) || item.quantity === 0)
+    );
+    
+    const responseCart = {
+      ...cart.toObject(),
+      items: validItems
+    };
+    
+    res.json(responseCart);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -153,17 +236,28 @@ const removeFromCart = async (req, res) => {
   try {
     const { productId } = req.body;
     
+    // Validate inputs
+    if (!isValidObjectId(productId)) {
+      return res.status(400).json({ message: 'Invalid product ID' });
+    }
+    
     if (req.useMockDb && req.mockDb) {
       // Use mock database
-      const cart = req.mockDb.removeFromCart(req.user.id, productId);
+      const cart = req.mockDb.removeFromCart(req.user.id, parseInt(productId));
       
-      // Populate product details
+      // Populate product details and filter out invalid items
+      const validItems = cart.items.filter(item => 
+        item && 
+        isValidObjectId(item.productId) && 
+        isValidQuantity(item.quantity)
+      );
+      
       const populatedCart = {
         ...cart,
-        items: cart.items.map(item => ({
+        items: validItems.map(item => ({
           productId: req.mockDb.getProductById(item.productId),
           quantity: item.quantity
-        }))
+        })).filter(item => item.productId) // Filter out items where product doesn't exist
       };
       
       return res.json(populatedCart);
@@ -182,7 +276,19 @@ const removeFromCart = async (req, res) => {
     // Populate product details
     await cart.populate('items.productId');
     
-    res.json(cart);
+    // Filter out invalid items from the response
+    const validItems = cart.items.filter(item => 
+      item && 
+      item.productId && 
+      isValidQuantity(item.quantity)
+    );
+    
+    const responseCart = {
+      ...cart.toObject(),
+      items: validItems
+    };
+    
+    res.json(responseCart);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -195,13 +301,19 @@ const clearCart = async (req, res) => {
       // Use mock database
       const cart = req.mockDb.clearCart(req.user.id);
       
-      // Populate product details
+      // Populate product details and filter out invalid items
+      const validItems = cart.items.filter(item => 
+        item && 
+        isValidObjectId(item.productId) && 
+        isValidQuantity(item.quantity)
+      );
+      
       const populatedCart = {
         ...cart,
-        items: cart.items.map(item => ({
+        items: validItems.map(item => ({
           productId: req.mockDb.getProductById(item.productId),
           quantity: item.quantity
-        }))
+        })).filter(item => item.productId) // Filter out items where product doesn't exist
       };
       
       return res.json(populatedCart);

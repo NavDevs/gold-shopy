@@ -24,6 +24,20 @@ interface WishlistItem {
   rating: number;
 }
 
+// Helper function to validate cart items
+export const isValidCartItem = (item: any): item is CartItem => {
+  return (
+    item != null &&
+    typeof item.id === 'number' &&
+    typeof item.name === 'string' &&
+    item.name.trim() !== '' &&
+    typeof item.price === 'number' &&
+    item.price > 0 &&
+    typeof item.quantity === 'number' &&
+    item.quantity > 0
+  );
+};
+
 // Get auth token from localStorage
 const getAuthToken = (): string | null => {
   if (typeof window === 'undefined') return null;
@@ -60,7 +74,12 @@ export const getCartItems = (): CartItem[] => {
   console.log('Getting cart from localStorage:', storedCart); // Add logging
   if (storedCart) {
     try {
-      return JSON.parse(storedCart);
+      const parsedCart = JSON.parse(storedCart);
+      // Filter out invalid items
+      if (Array.isArray(parsedCart)) {
+        return parsedCart.filter(isValidCartItem);
+      }
+      return [];
     } catch (e) {
       return [];
     }
@@ -79,6 +98,12 @@ export const addToCart = async (item: Omit<CartItem, 'quantity'>): Promise<void>
   console.log('Adding item to cart:', item); // Add logging
   if (typeof window === 'undefined') {
     console.log('Window is undefined, returning'); // Add logging
+    return;
+  }
+  
+  // Validate the item before adding
+  if (!item || !item.id || !item.name || item.name.trim() === '' || !item.price || item.price <= 0) {
+    console.error('Invalid item provided to addToCart:', item);
     return;
   }
   
@@ -135,6 +160,12 @@ export const addToCart = async (item: Omit<CartItem, 'quantity'>): Promise<void>
 export const updateCartQuantity = async (id: number, quantity: number): Promise<void> => {
   if (typeof window === 'undefined') return;
   
+  // Validate inputs
+  if (typeof id !== 'number' || typeof quantity !== 'number') {
+    console.error('Invalid parameters for updateCartQuantity:', { id, quantity });
+    return;
+  }
+  
   // Check if user is authenticated
   if (!isAuthenticated()) {
     console.log('User not authenticated for cart update'); // Add logging
@@ -185,6 +216,12 @@ export const updateCartQuantity = async (id: number, quantity: number): Promise<
 
 export const removeFromCart = async (id: number): Promise<void> => {
   if (typeof window === 'undefined') return;
+  
+  // Validate input
+  if (typeof id !== 'number') {
+    console.error('Invalid id for removeFromCart:', id);
+    return;
+  }
   
   // Check if user is authenticated
   if (!isAuthenticated()) {
@@ -242,6 +279,12 @@ export const getWishlistCount = (): number => {
 export const addToWishlist = async (item: WishlistItem): Promise<void> => {
   if (typeof window === 'undefined') return;
   
+  // Validate the item before adding
+  if (!item || !item.id || !item.name || item.name.trim() === '' || !item.price || item.price <= 0) {
+    console.error('Invalid item provided to addToWishlist:', item);
+    return;
+  }
+  
   // Check if user is authenticated
   if (!isAuthenticated()) {
     console.log('User not authenticated for wishlist'); // Add logging
@@ -283,6 +326,12 @@ export const addToWishlist = async (item: WishlistItem): Promise<void> => {
 export const removeFromWishlist = async (id: number): Promise<void> => {
   if (typeof window === 'undefined') return;
   
+  // Validate input
+  if (typeof id !== 'number') {
+    console.error('Invalid id for removeFromWishlist:', id);
+    return;
+  }
+  
   // Check if user is authenticated
   if (!isAuthenticated()) {
     console.log('User not authenticated for wishlist removal'); // Add logging
@@ -319,6 +368,12 @@ export const removeFromWishlist = async (id: number): Promise<void> => {
 
 export const moveFromWishlistToCart = async (id: number): Promise<void> => {
   if (typeof window === 'undefined') return;
+  
+  // Validate input
+  if (typeof id !== 'number') {
+    console.error('Invalid id for moveFromWishlistToCart:', id);
+    return;
+  }
   
   // Check if user is authenticated
   if (!isAuthenticated()) {
