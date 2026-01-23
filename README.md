@@ -1,84 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🪙 Gold Shopy – Digital Gold Management Platform
 
-## Getting Started
+Gold Shopy is a full-stack web application that enables users to buy, sell, and manage digital gold with real-time tracking.  
+It provides a seamless experience for customers and a powerful admin panel for shop owners.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌐 Live Links
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Frontend:** https://gold-shopy-frontend.onrender.com  
+- **Backend API:** https://gold-shopy.onrender.com  
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Key Features
 
-## New Features Implemented
-
-### Digital Gold Platform
-- Digital gold savings with real-time gold rates
-- Buy and sell digital gold instantly
-- Transaction history tracking
+### 💰 Digital Gold Platform
+- Real-time digital gold pricing
+- Instant buy and sell functionality
 - Secure storage with BIS hallmarked gold
+- Complete transaction history
 
-### Gold Scheme Interface
-- Monthly installment plans for gold savings
-- Multiple scheme options with different durations
-- Customer enrollment and payment tracking
-- Progress monitoring and gold accumulation tracking
+### 📆 Gold Saving Schemes
+- Monthly installment-based gold schemes
+- Multiple plan durations
+- Automatic progress and balance tracking
+- Gold accumulation visualization
 
-### Transaction Tracking System
-- Credit and debit transaction monitoring
-- Detailed transaction history with filters
+### 📊 Transaction Tracking
+- Credit and debit transaction records
+- Filterable transaction history
 - Payment method tracking
 - Real-time balance calculations
 
-## Project Structure
+---
 
-This project consists of three main components:
+## 🧩 Project Structure
 
-1. **Consumer Website** - Main storefront for customers (in `consumer-website/`)
-2. **Admin Panel** - Management interface for shop owners (in `gold-shop-admin/`)
-3. **Backend API** - Server-side API for data management (in `consumer-website/backend/`)
+The project is divided into three main components:
 
-## Deployment
+1. **Consumer Website**  
+   Customer-facing platform  
+   📁 `consumer-website/`
 
-### Deploying to Netlify
+2. **Admin Panel**  
+   Management dashboard for shop owners  
+   📁 `gold-shop-admin/`
 
-This project is configured for deployment to Netlify. See the detailed deployment guide:
+3. **Backend API**  
+   Handles authentication, transactions, and data storage  
+   📁 `consumer-website/backend/`
 
-- [Netlify Deployment Guide](DEPLOYMENT_NETLIFY.md) - Complete instructions for deploying all components
-- [Consumer Website Deployment](consumer-website/README_NETLIFY.md) - Specific instructions for the consumer website
-- [Admin Panel Deployment](gold-shop-admin/README_NETLIFY.md) - Specific instructions for the admin panel
+---
 
-### Backend API Deployment
+## 🛠️ Tech Stack
 
-The backend API needs to be deployed to a Node.js hosting service like:
-- Heroku
-- Railway
-- Render
-- DigitalOcean App Platform
+### Frontend
+- Next.js
+- React
+- TypeScript
+- CSS / Tailwind CSS
 
-See [DEPLOYMENT_NETLIFY.md](DEPLOYMENT_NETLIFY.md) for detailed instructions.
+### Backend
+- Node.js
+- Express.js
+- REST API
 
-## Learn More
+### Deployment
+- Frontend: Render
+- Backend: Render
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Getting Started (Local Setup)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Prerequisites
+- Node.js (v18+ recommended)
+- npm / yarn / pnpm
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Run Frontend
+```bash
+npm run dev
