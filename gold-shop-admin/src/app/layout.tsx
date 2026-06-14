@@ -6,8 +6,16 @@ import AdminLayout from './layout-admin';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Gold Shop Admin',
-  description: 'Admin interface for Gold Shop',
+  title: 'Shiva Jewellers - Admin Panel',
+  description: 'Admin interface for Shiva Jewellers Gold Shop',
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({

@@ -20,6 +20,14 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Shiva Jewellers - Where tradition tells a story of jewels",
   description: "Discover exquisite jewelry at Shiva Jewellers, Chintamani. Premium gold, diamond, and silver jewelry with traditional craftsmanship and modern designs. GST: 29AVMPK4429J1Z2",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F7DC6F;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#F1C40F;stop-opacity:1" />
+      <stop offset="60%" style="stop-color:#D4AC0D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B7950B;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="darkGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4AC0D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7D6608;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF9C4;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#F7DC6F;stop-opacity:0.2" />
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0a00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#2c1810;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a0a00;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="256" cy="256" r="256" fill="url(#bgGrad)"/>
+  <circle cx="256" cy="256" r="230" fill="none" stroke="url(#goldGrad)" stroke-width="3" opacity="0.6"/>
+  <circle cx="256" cy="256" r="220" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.3"/>
+  <polygon points="256,68 432,220 256,444 80,220" fill="url(#goldGrad)" stroke="#B7950B" stroke-width="2"/>
+  <polygon points="256,68 432,220 256,195 80,220" fill="url(#shine)" opacity="0.5"/>
+  <polygon points="80,220 256,195 256,444" fill="url(#darkGold)" opacity="0.4"/>
+  <polygon points="432,220 256,195 256,444" fill="url(#shine)" opacity="0.2"/>
+  <line x1="256" y1="68" x2="256" y2="195" stroke="#B7950B" stroke-width="1.5" opacity="0.6"/>
+  <line x1="256" y1="195" x2="80" y2="220" stroke="#B7950B" stroke-width="1" opacity="0.4"/>
+  <line x1="256" y1="195" x2="432" y2="220" stroke="#B7950B" stroke-width="1" opacity="0.4"/>
+  <line x1="256" y1="195" x2="256" y2="444" stroke="#B7950B" stroke-width="1" opacity="0.3"/>
+  <polygon points="180,195 332,195 370,220 256,220 142,220" fill="url(#shine)" opacity="0.3"/>
+  <circle cx="220" cy="130" r="4" fill="#FFF9C4" opacity="0.9"/>
+  <line x1="220" y1="118" x2="220" y2="142" stroke="#FFF9C4" stroke-width="1.5" opacity="0.7"/>
+  <line x1="208" y1="130" x2="232" y2="130" stroke="#FFF9C4" stroke-width="1.5" opacity="0.7"/>
+  <circle cx="380" cy="215" r="3" fill="#FFF9C4" opacity="0.7"/>
+  <line x1="380" y1="206" x2="380" y2="224" stroke="#FFF9C4" stroke-width="1" opacity="0.5"/>
+  <line x1="371" y1="215" x2="389" y2="215" stroke="#FFF9C4" stroke-width="1" opacity="0.5"/>
+  <text x="256" y="340" font-family="Georgia, 'Times New Roman', serif" font-size="120" font-weight="bold" fill="#1a0a00" text-anchor="middle" opacity="0.7">SJ</text>
+  <text x="256" y="340" font-family="Georgia, 'Times New Roman', serif" font-size="120" font-weight="bold" fill="url(#shine)" text-anchor="middle" opacity="0.4">SJ</text>
+</svg>
