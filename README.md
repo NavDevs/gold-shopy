@@ -8,7 +8,7 @@ It provides a seamless experience for customers and a powerful admin panel for s
 ## 🌐 Live Links
 
 - **Frontend:** https://gold-shopy-frontend.onrender.com  
-- **Backend API:** [[https://gold-shopy.onrender.com](https://gold-shopy-sdeh.onrender.com)]
+- **Backend API:** [https://gold-shopy.onrender.com](https://gold-shopy-sdeh.onrender.com)
 
 ---
 
